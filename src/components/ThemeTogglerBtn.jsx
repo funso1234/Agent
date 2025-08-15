@@ -3,6 +3,11 @@ import assets from '../assets/assets'
 
 const ThemeTogglerBtn = ({theme, setTheme}) => {
 
+    useEffect(()=>{
+        const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setTheme(theme || (prefersDarkMode ? 'dark' : 'ligt'))
+    },[])
+
     useEffect(() =>{
         if(theme === 'dark'){
             document.documentElement.classList.add('dark')
