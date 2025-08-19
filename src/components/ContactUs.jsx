@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Title from './Title'
 import assets from '../assets/assets'
 import { useForm, ValidationError } from "@formspree/react";
@@ -7,11 +7,18 @@ const ContactUs = () => {
 
     const [state, handleSubmit] = useForm("xpwlevre");
  const formRef = useRef(null);
+ const [showSuccess, setShowSuccess] = useState(false);
+
 
   // Reset form when succeeded
   useEffect(() => {
     if (state.succeeded && formRef.current) {
       formRef.current.reset();
+      setShowSuccess(true);
+
+      // Hide success after 5s
+      const timer = setTimeout(() => setShowSuccess(false), 5000);
+      return () => clearTimeout(timer)
     }
   }, [state.succeeded]);
   
@@ -50,7 +57,7 @@ const ContactUs = () => {
         <Title title='Reach out to us' desc='From strategy to execution, we craft
         digital solutions that move your business forward.'/>
 
-        {state.succeeded && (
+        {showSuccess && (
         <p className="text-green-600 font-semibold py-2 px-2 mt-4 bg-gray-300 border dark:border-gray-900 rounded-lg">
           Thanks! We’ll get back to you soon.
         </p>
