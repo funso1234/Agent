@@ -1,37 +1,48 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import Title from './Title'
 import assets from '../assets/assets'
-import toast from 'react-hot-toast'
+import { useForm, ValidationError } from "@formspree/react";
 
 const ContactUs = () => {
 
-    const onsubmit = async (event) => {
-        event.preventDefault();
+    const [state, handleSubmit] = useForm("xpwlevre");
+ const formRef = useRef(null);
+
+  // Reset form when succeeded
+  useEffect(() => {
+    if (state.succeeded && formRef.current) {
+      formRef.current.reset();
+    }
+  }, [state.succeeded]);
+  
+
+    // const onsubmit = async (event) => {
+    //     event.preventDefault();
         
-        const formData = new FormData(event.target);
+    //     const formData = new FormData(event.target);
 
-        formData.append("access_key", "b7349c2a-109c-4d51-a156-0707d0c11ee9");
+    //     formData.append("access_key", "b7349c2a-109c-4d51-a156-0707d0c11ee9");
 
-        try {
-             const response = await fetch("https://web3forms.com/submit", {
-             method: "POST",
-             body: formData
-             });
+    //     try {
+    //          const response = await fetch("https://web3forms.com/submit", {
+    //          method: "POST",
+    //          body: formData
+    //          });
 
-            const data = await response.json();
+    //         const data = await response.json();
 
-            if (data.success){
-            toast.success('Thank you for your submission!')
-            event.target.reset();
-            } else {
-             toast.error(data.message);
-            }
-            }catch (error){
-            toast.error(error.message);
-            }
+    //         if (data.success){
+    //         toast.success('Thank you for your submission!')
+    //         event.target.reset();
+    //         } else {
+    //          toast.error(data.message);
+    //         }
+    //         }catch (error){
+    //         toast.error(error.message);
+    //         }
 
        
-    }
+    // }
 
   return (
     <div id='contact-us' className='flex flex-col items-center gap-7 px-4 sm:px-12
@@ -39,7 +50,13 @@ const ContactUs = () => {
         <Title title='Reach out to us' desc='From strategy to execution, we craft
         digital solutions that move your business forward.'/>
 
-        <form onSubmit={onsubmit} className='grid sm:grid-cols-2 gap-3 sm:gap-5 max-w-2xl w-full'>
+        {state.succeeded && (
+        <p className="text-green-600 font-semibold py-2 px-2 mt-4 bg-gray-300 border dark:border-gray-900 rounded-lg">
+          Thanks! We’ll get back to you soon.
+        </p>
+      )}
+
+        <form ref={formRef} onSubmit={handleSubmit} className='grid sm:grid-cols-2 gap-3 sm:gap-5 max-w-2xl w-full'>
             
             <div>
                 <p className='mb-2 text-sm font-medium'>Your name</p>
@@ -47,6 +64,7 @@ const ContactUs = () => {
                     <img src={assets.person_icon} alt="" />
                     <input name='name' type="text" placeholder='Enter your name' className='w-full
                     p-3 text-sm outline-none' required/>
+                    <ValidationError prefix="Name" field="name" errors={state.errors} />
                 </div>
             </div>
 
@@ -57,6 +75,7 @@ const ContactUs = () => {
                     <img src={assets.email_icon} alt="" />
                     <input name='email' type="email" placeholder='Enter your email' className='w-full
                     p-3 text-sm outline-none' required/>
+                    <ValidationError prefix="Email" field="email" errors={state.errors} />
                 </div>
             </div>
 
@@ -64,11 +83,14 @@ const ContactUs = () => {
                 <p className='mb-2 text-sm font-medium'>Message</p>
                 <textarea name='meassage' rows={8} placeholder='Enter your message' className='w-full
                 p-3 text-sm outline-none rounded-lg border border-gray-300 dark:border-gray-600' required/>
+                <ValidationError prefix="Message" field="message" errors={state.errors} />
             </div>
 
             <button type="submit" className='w-max flex gap-2 bg-primary text-white
             text-sm px-10 py-3 rounded-full cursor-pointer hover:scale-103 transition-all'>
-                Submit <img src={assets.arrow_icon} alt=""  className='w-4'/>
+                {state.submitting ? "Sending..." : "Submit"}
+                 <img src={assets.arrow_icon} alt=""  className='w-4'/>
+                
             </button>
 
         </form>
